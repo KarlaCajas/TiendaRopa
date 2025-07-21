@@ -1,0 +1,39 @@
+name: SonarQube Analysis
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  sonar:
+    name: SonarQube Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+
+      - name: Install SonarQube Scanner
+        run: |
+          curl -sSLo sonarscanner.zip https://github.com/SonarSource/sonar-scanner-cli/releases/download/4.6.2.2472/sonar-scanner-cli-4.6.2.2472-linux.zip
+          unzip sonarscanner.zip
+          export PATH=$PWD/sonar-scanner-*/bin:$PATH
+
+      - name: Run SonarQube Analysis
+        run: |
+          sonar-scanner \
+            -Dsonar.projectKey=tienda-ropa \
+            -Dsonar.projectName="Tienda Ropa" \
+            -Dsonar.projectVersion=1.0 \
+            -Dsonar.sources=. \
+            -Dsonar.language=php \
+            -Dsonar.php.exclusions=**/vendor/**
